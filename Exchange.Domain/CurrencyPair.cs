@@ -1,4 +1,4 @@
 ﻿namespace Exchange.Domain
 {
-    public readonly record struct CurrencyPair(Currency First, Currency Second, decimal Ratio);
+    public readonly record struct CurrencyPair(string First, string Second);
 }
