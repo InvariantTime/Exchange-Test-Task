@@ -2,7 +2,7 @@
 
 namespace Exchange.Connectors
 {
-    interface ITestConnector
+    public interface ITestConnector
     {
         #region Rest
 
