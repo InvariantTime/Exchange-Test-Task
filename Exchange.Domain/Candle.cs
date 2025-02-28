@@ -6,7 +6,7 @@ namespace Exchange.Domain
         /// <summary>
         /// Валютная пара
         /// </summary>
-        public string Pair { get; set; } = string.Empty;
+        public CurrencyPair Pair { get; set; }
 
         /// <summary>
         /// Цена открытия
