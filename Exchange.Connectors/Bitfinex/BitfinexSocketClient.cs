@@ -1,24 +1,44 @@
-﻿using System.Net.WebSockets;
+﻿using Exchange.Domain;
+using System.Net.WebSockets;
 
 namespace Exchange.Connectors.Bitfinex
 {
     public class BitfinexSocketClient
     {
-        private static readonly Uri _uri = new("");
+        private static readonly Uri _uri = new("wss://api-pub.bitfinex.com/ws/2");
 
-        private readonly ClientWebSocket _socket;
+        private WebSocketSession? _session;
 
-        private BitfinexSocketClient(ClientWebSocket socket)
+        public event Action<Trade>? TradeExecuted;
+        public event Action<Candle>? CandleExecuted;
+
+        public async Task ConnectAsync()
         {
-            _socket = socket;
+            if (_session != null && _session.State == WebSocketState.Open)
+                throw new Exception("Client is already connected");
+
+            _session?.Dispose();
+            _session = await WebSocketSession.CreateSessionAsync(_uri, OnMessageRecived);
         }
 
-        public async static Task<BitfinexSocketClient> Connect()
+        public Task SubscribeChannelAsync(BitfinexSubscribeInfo info)
         {
-            var socket = new ClientWebSocket();
-            await socket.ConnectAsync(_uri, default);
+            return Task.CompletedTask;
+        }
 
-            return new BitfinexSocketClient(socket);
+        public Task UnsubscribeChannelAsync(BitfinexUnsubscribeInfo info)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task DisconnectAsync()
+        {
+            return _session?.DisconnectAsync() ?? Task.CompletedTask;
+        }
+
+        private void OnMessageRecived(object o)
+        {
+
         }
     }
 }
