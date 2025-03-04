@@ -2,6 +2,11 @@
 
 namespace Exchange.Connectors
 {
+    /*ИЗМЕНЕНИЯ
+    *Для Валютных пар был создан отдельная структура CurrencyPair для более гибкого парсинга валют
+    *
+    *Методы Subscribe и Unsubscribe были превращены в свои асинхронные версии, так как эти методы используются для взаимодействия с сетью (с web socket).
+    */
     public interface ITestConnector
     {
         #region Rest
@@ -13,15 +18,14 @@ namespace Exchange.Connectors
 
         #region Socket
 
-
         event Action<Trade> NewBuyTrade;
         event Action<Trade> NewSellTrade;
-        void SubscribeTrades(CurrencyPair pair, int maxCount = 100);
-        void UnsubscribeTrades(CurrencyPair pair);
+        Task SubscribeTradesAsync(CurrencyPair pair, int maxCount = 100);
+        Task UnsubscribeTradesAsync(CurrencyPair pair);
 
         event Action<Candle> CandleSeriesProcessing;
-        void SubscribeCandles(CurrencyPair pair, int periodInSec, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = 0);
-        void UnsubscribeCandles(CurrencyPair pair);
+        Task SubscribeCandlesAsync(CurrencyPair pair, int periodInSec, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = 0);
+        Task UnsubscribeCandlesAsync(CurrencyPair pair);
 
         #endregion
 
