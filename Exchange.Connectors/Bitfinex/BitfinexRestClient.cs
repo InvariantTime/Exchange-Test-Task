@@ -10,7 +10,7 @@ namespace Exchange.Connectors.Bitfinex
         private const string _pairFormat = "t{0}{1}";
 
         private const string _urlTrades = "https://api-pub.bitfinex.com/v2/trades/";
-        private const string _urlCandles = "https://api-pub.bitfinex.com/v2/candles/";
+        private const string _urlCandles = "https://api-pub.bitfinex.com/v2/candles/trade:";
 
         private readonly HttpClient _http;
         private readonly BitfinexConverter _converter;
@@ -34,12 +34,13 @@ namespace Exchange.Connectors.Bitfinex
             return trades;
         }
 
-        public async Task<IEnumerable<Candle>> GetCandlesAsync(CurrencyPair pair, int periodInSeconds, DateTimeOffset from, DateTimeOffset to)
+        public async Task<IEnumerable<Candle>> GetCandlesAsync(CurrencyPair pair, int periodInSeconds, DateTimeOffset? from, DateTimeOffset? to)
         {
             var symbol = pair.Format(_pairFormat);
-            var period = _converter.ConvertSecondsPeriod(periodInSeconds);
+            var period = BitfinexTime.ConvertSecondsPeriod(periodInSeconds);
 
-            var json = await _http.GetFromJsonAsync<JsonArray>(_urlCandles + $"{symbol}:{period}/hist?start={from.Millisecond}&end={to.Millisecond}");
+
+            var json = await _http.GetFromJsonAsync<JsonArray>(_urlCandles + $"{period}:{symbol}/hist?start={from?.Millisecond ?? 0}&end={to?.Millisecond ?? 0}");
             
             if (json == null)
                 return Enumerable.Empty<Candle>();
