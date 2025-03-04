@@ -13,9 +13,9 @@ namespace Exchange.Connectors.Bitfinex
                     continue;
 
                 int id = (int)(item[0] ?? 0);
-                int mts = (int)(item[1] ?? 0);
-                decimal price = (decimal)(item[2] ?? 0);
+                long mts = (long)(item[1] ?? 0);
                 decimal amount = (decimal)(item[2] ?? 0);
+                decimal price = (decimal)(item[3] ?? 0);
 
                 var side = GetSide(amount);
 

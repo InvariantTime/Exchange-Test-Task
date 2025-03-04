@@ -6,6 +6,12 @@
 
         public string Second { get; init; }
 
+        public CurrencyPair(string first, string second)
+        {
+            First = first;
+            Second = second;
+        }
+
         public string Format(string pattern)
         {
             return string.Format(pattern, First, Second);
