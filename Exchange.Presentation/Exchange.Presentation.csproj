@@ -8,4 +8,9 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Exchange.Connectors\Exchange.Connectors.csproj" />
+    <ProjectReference Include="..\Exchange.Domain\Exchange.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -1,0 +1,27 @@
+﻿<Window x:Class="Exchange.Presentation.View.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Exchange.Presentation.View"
+        xmlns:controls ="clr-namespace:Exchange.Presentation.View.Controls"
+        mc:Ignorable="d"
+        Title="Exchange" Height="650" Width="900"
+        ResizeMode="NoResize"
+        Background="{StaticResource BackgroundColor}">
+    <Grid>
+        <TabControl>
+            <TabItem Header="Rest">
+                <controls:RestClientPanel DataContext="{Binding Rest}"/>
+            </TabItem>
+
+            <TabItem Header="WebSocket">
+                <controls:WebSocketPanel DataContext="{Binding Socket}"/>
+            </TabItem>
+
+            <TabItem Header="Profile">
+                <controls:ProfileControl DataContext="{Binding Profile}"/>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

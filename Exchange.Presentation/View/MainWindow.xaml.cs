@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Exchange.Presentation.ViewModels;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -9,16 +10,18 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace Exchange.Presentation
+namespace Exchange.Presentation.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow(MainViewmodel viewmodel)
         {
             InitializeComponent();
+
+            DataContext = viewmodel;
         }
     }
 }
