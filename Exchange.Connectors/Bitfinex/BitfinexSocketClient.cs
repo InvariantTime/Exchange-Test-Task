@@ -18,7 +18,7 @@ namespace Exchange.Connectors.Bitfinex
 
         private WebSocketSession? _session;
 
-        public event Action<IEnumerable<Trade>>? TradeExecuted;
+        public event Action<Trade>? TradeExecuted;
         public event Action<IEnumerable<Candle>>? CandleExecuted;
 
         public bool IsConnected => _session != null && _session.State == WebSocketState.Open;
@@ -119,7 +119,6 @@ namespace Exchange.Connectors.Bitfinex
             }
             else if (json.ValueKind == JsonValueKind.Array)
             {
-                var type = json[1].GetString() ?? string.Empty;
                 var id = json[0].GetInt32();
 
                 var channel = _channels.FirstOrDefault(x => x.Id == id);
@@ -127,11 +126,11 @@ namespace Exchange.Connectors.Bitfinex
                 if (channel == null)
                     return;
 
-                if (type == "te")
+                if (channel.Type == _tradeChannel && json[1].ValueKind == JsonValueKind.String && json[1].GetString() == "te")
                 {
                     HandleTrades(json, channel);
                 }
-                else if (json[1].ValueKind == JsonValueKind.Array)
+                else if (channel.Type == _candleChannel && json[1].ValueKind == JsonValueKind.Array)
                 {
                     HandleCandles(json, channel);
                 }
@@ -169,17 +168,13 @@ namespace Exchange.Connectors.Bitfinex
 
         private void HandleTrades(JsonElement element, BitfinexChannel channel)
         {
-            var trades = _converter.ConvertTrades(channel.Pair, JsonArray.Create(element[2])!);
-
-            if (channel.Limit > 0)
-                trades = trades.Take(channel.Limit);
-
-            TradeExecuted?.Invoke(trades);
+            var trade = _converter.ConvertTrade(channel.Pair, element[2]);
+            TradeExecuted?.Invoke(trade);
         }
 
         private void HandleCandles(JsonElement element, BitfinexChannel channel)
         {
-            var candles = _converter.ConvertCandles(channel.Pair, JsonArray.Create(element[2])!);
+            var candles = _converter.ConvertCandles(channel.Pair, JsonArray.Create(element[1])!);
 
             if (channel.Limit > 0)
                 candles = candles.Take(channel.Limit);
