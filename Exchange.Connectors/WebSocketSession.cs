@@ -63,38 +63,41 @@ namespace Exchange.Connectors
             Action<JsonElement> onMessageRecived, CancellationTokenSource source)
         {
             using var stream = new MemoryStream();
-
-            while (source.IsCancellationRequested == false && client.State == WebSocketState.Open)
+            try
             {
-                WebSocketReceiveResult result = null!;
-
-                do
+                while (source.IsCancellationRequested == false && client.State == WebSocketState.Open)
                 {
-                    var buffer = WebSocket.CreateClientBuffer(2048, 16);
-                    result = await client.ReceiveAsync(buffer, source.Token);
+                    WebSocketReceiveResult result = null!;
+                    do
+                    {
+                        var buffer = WebSocket.CreateClientBuffer(2048, 16);
+                        result = await client.ReceiveAsync(buffer, source.Token);
 
-                    if (buffer.Array == null)
-                        continue;
+                        if (buffer.Array == null)
+                            continue;
 
-                    stream.Write(buffer.Array, buffer.Offset, result.Count);
+                        stream.Write(buffer.Array, buffer.Offset, result.Count);
+                    }
+                    while (result.EndOfMessage == false && source.IsCancellationRequested == false);
+
+                    if (result.MessageType == WebSocketMessageType.Text)
+                    {
+                        var message = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Position);
+                        var json = JsonSerializer.Deserialize<JsonDocument>(message);
+
+                        if (json == null)
+                            continue;
+
+                        onMessageRecived.Invoke(json.RootElement);
+                    }
+
+                    stream.Seek(0, SeekOrigin.Begin);
                 }
-                while (result.EndOfMessage == false && source.IsCancellationRequested == false);
-
-                if (result.MessageType == WebSocketMessageType.Text)
-                {
-                    var message = Encoding.UTF8.GetString(stream.GetBuffer(), 0, (int)stream.Position);
-                    var json = JsonSerializer.Deserialize<JsonDocument>(message);
-
-                    if (json == null)
-                        continue;
-
-                    onMessageRecived.Invoke(json.RootElement);
-                }
-
-                stream.Seek(0, SeekOrigin.Begin);
             }
-
-            await client.CloseAsync(WebSocketCloseStatus.Empty, string.Empty, CancellationToken.None);
+            finally
+            {
+                await client.CloseAsync(WebSocketCloseStatus.Empty, string.Empty, CancellationToken.None);
+            }
         }
     }
 }

@@ -2,11 +2,11 @@
 {
     public class QueryModel
     {
-        public string FirstCurrency { get; set; } = string.Empty;
+        public string FirstCurrency { get; set; } = "BTC";
 
-        public string SecondCurrency { get; set; } = string.Empty;
+        public string SecondCurrency { get; set; } = "USD";
 
-        public int Limit { get; set; } = 0;
+        public int Limit { get; set; } = 1;
 
         public int Frame { get; set; } = 60;
 

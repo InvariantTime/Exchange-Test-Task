@@ -19,7 +19,7 @@ namespace Exchange.Connectors.Bitfinex
         private WebSocketSession? _session;
 
         public event Action<Trade>? TradeExecuted;
-        public event Action<IEnumerable<Candle>>? CandleExecuted;
+        public event Action<Candle>? CandleExecuted;
 
         public bool IsConnected => _session != null && _session.State == WebSocketState.Open;
 
@@ -130,7 +130,7 @@ namespace Exchange.Connectors.Bitfinex
                 {
                     HandleTrades(json, channel);
                 }
-                else if (channel.Type == _candleChannel && json[1].ValueKind == JsonValueKind.Array)
+                else if (channel.Type == _candleChannel && json[1].ValueKind == JsonValueKind.Array && json[1][0].ValueKind != JsonValueKind.Array)
                 {
                     HandleCandles(json, channel);
                 }
@@ -174,12 +174,8 @@ namespace Exchange.Connectors.Bitfinex
 
         private void HandleCandles(JsonElement element, BitfinexChannel channel)
         {
-            var candles = _converter.ConvertCandles(channel.Pair, JsonArray.Create(element[1])!);
-
-            if (channel.Limit > 0)
-                candles = candles.Take(channel.Limit);
-
-            CandleExecuted?.Invoke(candles);
+            var candle = _converter.ConvertCandle(channel.Pair, element[1]);
+            CandleExecuted?.Invoke(candle);
         }
     }
 }

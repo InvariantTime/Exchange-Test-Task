@@ -59,13 +59,9 @@ namespace Exchange.Connectors.Bitfinex
                 .Wait();
         }
 
-        private void CandleExecuted(IEnumerable<Candle> candles)
+        private void CandleExecuted(Candle candle)
         {
-            if (CandleSeriesProcessing == null)
-                return;
-
-            foreach (var candle in candles)
-                CandleSeriesProcessing.Invoke(candle);
+            CandleSeriesProcessing?.Invoke(candle);
         }
 
         private void TradesExecuted(Trade trade)
